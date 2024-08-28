@@ -1,0 +1,48 @@
+class Polygons:
+    def __init__(self, m, R):
+        if m < 3:
+            raise ValueError('m must be greater than 3')
+        self._m = m
+        self._R = R
+        
+    def __len__(self):
+        return self._m - 2
+    
+    def __repr__(self):
+        return f'Polygons(m={self._m}, R={self._R})'
+    
+    def __getitem__(self, s):
+        if isinstance(s, int):
+            if s < 0 or s >= len(self):
+                raise IndexError('Index out of range')
+            else:
+                return Polygon(s+3, self._R)
+        else:
+            start, stop, step = s.indices(len(self))
+            rng = range(start, stop, step)
+            return [Polygon(i+3, self._R) for i in rng]
+    
+    def __iter__(self):
+        return self.PolygonIterator(self._m, self._R)
+    
+    class PolygonIterator:
+        def __init__(self, m, R):
+            self._m = m
+            self._R = R
+            self._index = 0
+            
+        def __iter__(self):
+            return self
+        
+        def __next__(self):
+            if self._index >= self._m - 2:
+                raise StopIteration
+            else:
+                result = Polygon(self._index + 3, self._R)
+                self._index += 1
+                return result
+    
+    @property
+    def max_efficiency_polygon(self):
+        sorted_polygons = sorted(self, key=lambda p: p.area/p.perimeter, reverse=True)
+        return sorted_polygons[0]
